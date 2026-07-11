@@ -1,0 +1,38 @@
+services:
+  db:
+    image: mariadb:11.4
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-eventpulse}
+      MARIADB_USER: ${MARIADB_USER:-eventpulse}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-eventpulse}
+    ports:
+      - "3306:3306"
+    volumes:
+      - eventpulse_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mariadb://db:3306/eventpulse}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-eventpulse}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-eventpulse}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  eventpulse_db:

@@ -1,0 +1,9 @@
+databaseChangeLog:
+  # Phase 0 baseline. Domain tables (users, events, bookings) land in later phases
+  # as new changelog files — never edit this file once merged.
+  - changeSet:
+      id: 001-baseline
+      author: Victor Butita
+      changes:
+        - tagDatabase:
+            tag: baseline-v0
