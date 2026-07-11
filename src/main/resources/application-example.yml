@@ -1,0 +1,25 @@
+# Copy values into your local environment or docker-compose.
+# Do not commit real secrets — use .env / CircleCI env vars instead.
+
+spring:
+  application:
+    name: eventpulse-api
+  datasource:
+    url: jdbc:mariadb://localhost:3306/eventpulse
+    username: eventpulse
+    password: change-me
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+server:
+  port: 8080
+
+# CircleCI / SonarQube Cloud (set in CircleCI Project Settings → Environment Variables):
+#   SONAR_TOKEN
+#   SONAR_PROJECT_KEY
+#   SONAR_ORGANIZATION
