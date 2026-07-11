@@ -23,11 +23,12 @@ jobs:
               echo "Missing CircleCI env vars: SONAR_TOKEN, SONAR_PROJECT_KEY, SONAR_ORGANIZATION"
               exit 1
             fi
+            echo "Sonar org=${SONAR_ORGANIZATION} projectKey=${SONAR_PROJECT_KEY} token_set=yes"
             mvn sonar:sonar \
               -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
               -Dsonar.organization=${SONAR_ORGANIZATION} \
               -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.token=$SONAR_TOKEN \
+              -Dsonar.token=${SONAR_TOKEN} \
               -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
 workflows:
