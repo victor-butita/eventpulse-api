@@ -16,54 +16,21 @@ class StartupBanner(
 
     @EventListener(ApplicationReadyEvent::class)
     fun onReady() {
-        val port = serverProperties.port ?: 8080
-        val contextPath = serverProperties.servlet.contextPath
-            ?.takeIf { it.isNotBlank() && it != "/" }
-            ?: ""
-        val base = "http://localhost:$port$contextPath"
-        val profiles = environment.activeProfiles
-            .takeIf { it.isNotEmpty() }
-            ?.joinToString(", ")
-            ?: "default"
-
-        val health = "$base/api/v1/health"
-        val swagger = "$base/swagger-ui.html"
-        val openApi = "$base/v3/api-docs"
-        val repo = "https://github.com/victor-butita/eventpulse-api"
-
-        val banner = """
-            
-            $CYAN━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$RESET
-              $BOLD$GREEN● EventPulse API$RESET  $DIM— ready$RESET
-            $CYAN━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$RESET
-
-              $BOLD Local$RESET
-                App ............. $YELLOW$base$RESET
-                Health .......... $YELLOW$health$RESET
-
-              $BOLD Docs$RESET
-                Swagger UI ...... $YELLOW$swagger$RESET
-                OpenAPI JSON .... $YELLOW$openApi$RESET
-
-              $BOLD Project$RESET
-                Repository ...... $YELLOW$repo$RESET
-                Profile(s) ...... $GREEN$profiles$RESET
-                Port ............ $GREEN$port$RESET
-
-            $CYAN━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$RESET
-
-            """.trimIndent()
+        val banner = StartupAccessInfo.formatBanner(
+            port = serverProperties.port,
+            contextPath = serverProperties.servlet.contextPath,
+            activeProfiles = environment.activeProfiles,
+        )
+        val port = StartupAccessInfo.resolvePort(serverProperties.port)
+        val contextPath = StartupAccessInfo.resolveContextPath(serverProperties.servlet.contextPath)
+        val base = StartupAccessInfo.baseUrl(port, contextPath)
 
         println(banner)
-        log.info("EventPulse ready — health={} | swagger={} | repo={}", health, swagger, repo)
-    }
-
-    companion object {
-        private const val RESET = "\u001B[0m"
-        private const val BOLD = "\u001B[1m"
-        private const val DIM = "\u001B[2m"
-        private const val GREEN = "\u001B[32m"
-        private const val CYAN = "\u001B[36m"
-        private const val YELLOW = "\u001B[33m"
+        log.info(
+            "EventPulse ready — health={} | swagger={} | repo={}",
+            "$base/api/v1/health",
+            "$base/swagger-ui.html",
+            StartupAccessInfo.REPO_URL,
+        )
     }
 }
