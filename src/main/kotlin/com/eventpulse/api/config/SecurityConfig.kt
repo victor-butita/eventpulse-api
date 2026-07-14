@@ -11,17 +11,23 @@ import org.springframework.security.web.SecurityFilterChain
 class SecurityConfig {
 
     @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
+    fun passwordEncoder(): PasswordEncoder =
+        BCryptPasswordEncoder()
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+
         http
             .csrf { it.disable() }
-            .authorizeHttpRequests {
-                it
-                    .requestMatchers("/api/auth/**").permitAll()
+            .authorizeHttpRequests { auth ->
+                auth
+                    .requestMatchers(
+                        "/api/auth/**",
+                        "/api/v1/health",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**"
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
 

@@ -60,7 +60,7 @@ class AuthServiceTest {
             .isEqualTo(Role.ATTENDEE)
 
         verify(exactly = 1) {
-            userRepository.save(any())
+            userRepository.save(userSlot.captured)
         }
     }
 
@@ -83,7 +83,7 @@ class AuthServiceTest {
             .isEqualTo("Email already exists")
 
         verify(exactly = 0) {
-            userRepository.save(any())
+            userRepository.save(ofType(User::class))
         }
     }
 }
