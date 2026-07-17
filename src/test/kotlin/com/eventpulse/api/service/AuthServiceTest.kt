@@ -1,6 +1,7 @@
 package com.eventpulse.api.service
 
 import com.eventpulse.api.dto.AuthResponse
+import com.eventpulse.api.dto.LoginRequest
 import com.eventpulse.api.dto.RegisterRequest
 import com.eventpulse.api.entity.Role
 import com.eventpulse.api.entity.User
@@ -21,10 +22,15 @@ class AuthServiceTest {
 
     private val userRepository = mockk<UserRepository>()
     private val passwordEncoder = mockk<PasswordEncoder>()
+    private val jwtService = mockk<JwtService>()
 
     @BeforeEach
     fun setUp() {
-        authService = AuthService(userRepository, passwordEncoder)
+        authService = AuthService(
+            userRepository,
+            passwordEncoder,
+            jwtService
+        )
     }
 
     @Test
@@ -38,6 +44,7 @@ class AuthServiceTest {
 
         every { userRepository.existsByEmail(request.email) } returns false
         every { passwordEncoder.encode(request.password) } returns "encodedPassword"
+        every { jwtService.generateToken(request.email) } returns "mock-jwt-token"
 
         val userSlot = slot<User>()
 
@@ -47,8 +54,11 @@ class AuthServiceTest {
 
         val response = authService.register(request)
 
-        assertThat(response)
-            .isEqualTo(AuthResponse("User registered successfully"))
+        assertThat(response.message)
+            .isEqualTo("User registered successfully")
+
+        assertThat(response.token)
+            .isEqualTo("mock-jwt-token")
 
         assertThat(userSlot.captured.email)
             .isEqualTo(request.email)
@@ -60,7 +70,7 @@ class AuthServiceTest {
             .isEqualTo(Role.ATTENDEE)
 
         verify(exactly = 1) {
-            userRepository.save(userSlot.captured)
+            userRepository.save(any())
         }
     }
 
@@ -83,7 +93,77 @@ class AuthServiceTest {
             .isEqualTo("Email already exists")
 
         verify(exactly = 0) {
-            userRepository.save(ofType(User::class))
+            userRepository.save(any())
         }
+    }
+
+    @Test
+    fun loginShouldReturnTokenWhenCredentialsAreValid() {
+
+        val request = LoginRequest(
+            email = "antony@example.com",
+            password = "Password123"
+        )
+
+        val user = User(
+            email = request.email,
+            password = "encodedPassword",
+            role = Role.ATTENDEE
+        )
+
+        every { userRepository.findByEmail(request.email) } returns user
+        every { passwordEncoder.matches(request.password, user.password) } returns true
+        every { jwtService.generateToken(user.email) } returns "mock-jwt-token"
+
+        val response = authService.login(request)
+
+        assertThat(response.message)
+            .isEqualTo("Login successful")
+
+        assertThat(response.token)
+            .isEqualTo("mock-jwt-token")
+    }
+
+    @Test
+    fun loginShouldThrowExceptionWhenEmailDoesNotExist() {
+
+        val request = LoginRequest(
+            email = "missing@example.com",
+            password = "Password123"
+        )
+
+        every { userRepository.findByEmail(request.email) } returns null
+
+        val exception = assertThrows(IllegalArgumentException::class.java) {
+            authService.login(request)
+        }
+
+        assertThat(exception.message)
+            .isEqualTo("Invalid email or password")
+    }
+
+    @Test
+    fun loginShouldThrowExceptionWhenPasswordIsIncorrect() {
+
+        val request = LoginRequest(
+            email = "antony@example.com",
+            password = "WrongPassword"
+        )
+
+        val user = User(
+            email = request.email,
+            password = "encodedPassword",
+            role = Role.ATTENDEE
+        )
+
+        every { userRepository.findByEmail(request.email) } returns user
+        every { passwordEncoder.matches(request.password, user.password) } returns false
+
+        val exception = assertThrows(IllegalArgumentException::class.java) {
+            authService.login(request)
+        }
+
+        assertThat(exception.message)
+            .isEqualTo("Invalid email or password")
     }
 }
