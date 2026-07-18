@@ -2,56 +2,92 @@
 
 title EventPulse — Login to Order Fulfilment (Happy Path)
 
-actor User
-participant "Frontend" as UI
-participant "API\n(Controllers)" as API
-participant "Services" as SVC
-database "MariaDB" as DB
+autonumber "<b>##</b>"
+
+actor "1. User" as User
+participant "2. Frontend" as UI
+participant "3. API\n(Controllers)" as API
+participant "4. Services" as SVC
+database "5. MariaDB" as DB
 
 == Login ==
 User -> UI : Email + password
+activate UI
 UI -> API : POST /api/auth/login
+activate API
 API -> SVC : AuthService.login()
+activate SVC
 SVC -> DB : Find user by email
+activate DB
 DB --> SVC : User
+deactivate DB
 SVC -> SVC : Check password + issue JWT
 SVC --> API : token
+deactivate SVC
 API --> UI : 200 OK { token }
+deactivate API
 UI --> User : Dashboard
+deactivate UI
 
 == Browse events ==
 User -> UI : Browse / select tickets
+activate UI
 UI -> API : GET /api/events
+activate API
 API -> SVC : EventService.getEvents()
+activate SVC
 SVC -> DB : Load events
+activate DB
 DB --> SVC : Events
+deactivate DB
 SVC --> API : Event list
+deactivate SVC
 API --> UI : Events
+deactivate API
 UI --> User : Show events + availability
+deactivate UI
 
 == Book ==
 User -> UI : Confirm booking
+activate UI
 UI -> API : POST /api/bookings
+activate API
 API -> SVC : BookingService.createBooking()
+activate SVC
 SVC -> DB : Reserve seats, save booking (PENDING)
+activate DB
 DB --> SVC : Booking saved
+deactivate DB
 SVC --> API : Booking (pending payment)
+deactivate SVC
 API --> UI : Booking created
+deactivate API
 UI --> User : Go to payment
+deactivate UI
 
 == Pay ==
 User -> UI : Pay
+activate UI
 UI -> API : POST /api/payments
+activate API
 API -> SVC : PaymentService.processPayment()
+activate SVC
 SVC -> SVC : Charge payment provider
 SVC -> DB : Save transaction (SUCCESS)\nConfirm booking (CONFIRMED)
+activate DB
 DB --> SVC : Updated
+deactivate DB
 SVC --> API : Payment + booking confirmed
+deactivate SVC
 API --> UI : Order confirmed
+deactivate API
+deactivate UI
 
 == Fulfil ==
+activate SVC
 SVC -> SVC : NotificationService\n(generate ticket)
 SVC -> User : Email / SMS ticket
+deactivate SVC
 UI --> User : Confirmation + ticket
 
 note right of API
