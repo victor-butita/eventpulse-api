@@ -1,0 +1,62 @@
+@startuml EventPulse_Login_To_Fulfilment_Monolith
+
+title EventPulse — Login to Order Fulfilment (Happy Path)
+
+actor User
+participant "Frontend" as UI
+participant "API\n(Controllers)" as API
+participant "Services" as SVC
+database "MariaDB" as DB
+
+== Login ==
+User -> UI : Email + password
+UI -> API : POST /api/auth/login
+API -> SVC : AuthService.login()
+SVC -> DB : Find user by email
+DB --> SVC : User
+SVC -> SVC : Check password + issue JWT
+SVC --> API : token
+API --> UI : 200 OK { token }
+UI --> User : Dashboard
+
+== Browse events ==
+User -> UI : Browse / select tickets
+UI -> API : GET /api/events
+API -> SVC : EventService.getEvents()
+SVC -> DB : Load events
+DB --> SVC : Events
+SVC --> API : Event list
+API --> UI : Events
+UI --> User : Show events + availability
+
+== Book ==
+User -> UI : Confirm booking
+UI -> API : POST /api/bookings
+API -> SVC : BookingService.createBooking()
+SVC -> DB : Reserve seats, save booking (PENDING)
+DB --> SVC : Booking saved
+SVC --> API : Booking (pending payment)
+API --> UI : Booking created
+UI --> User : Go to payment
+
+== Pay ==
+User -> UI : Pay
+UI -> API : POST /api/payments
+API -> SVC : PaymentService.processPayment()
+SVC -> SVC : Charge payment provider
+SVC -> DB : Save transaction (SUCCESS)\nConfirm booking (CONFIRMED)
+DB --> SVC : Updated
+SVC --> API : Payment + booking confirmed
+API --> UI : Order confirmed
+
+== Fulfil ==
+SVC -> SVC : NotificationService\n(generate ticket)
+SVC -> User : Email / SMS ticket
+UI --> User : Confirmation + ticket
+
+note right of API
+  Login is implemented.
+  Events → book → pay → fulfil are planned.
+end note
+
+@enduml
