@@ -3,3 +3,6 @@ databaseChangeLog:
       file: db/changelog/changes/001-baseline.yaml
   - include:
       file: db/changelog/changes/002-add-users-table.yaml
+
+  - include:
+      file: db/changelog/changes/003-add-events-table.yaml
