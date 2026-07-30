@@ -19,8 +19,12 @@ class EventController(
     @PostMapping
     @PreAuthorize("hasRole('ORGANIZER')")
     fun createEvent(
+<<<<<<< Updated upstream
         @Valid
         @RequestBody request: CreateEventRequest,
+=======
+        @Valid @RequestBody request: CreateEventRequest,
+>>>>>>> Stashed changes
         authentication: Authentication
     ): ResponseEntity<Event> {
 
@@ -29,8 +33,12 @@ class EventController(
             authentication.name
         )
 
+<<<<<<< Updated upstream
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(event)
+=======
+        return ResponseEntity(event, HttpStatus.CREATED)
+>>>>>>> Stashed changes
     }
 }
