@@ -1,6 +1,7 @@
 package com.eventpulse.api.controller
 
 import com.eventpulse.api.dto.CreateEventRequest
+import com.eventpulse.api.dto.UpdateEventRequest
 import com.eventpulse.api.entity.Event
 import com.eventpulse.api.service.EventService
 import jakarta.validation.Valid
@@ -29,5 +30,37 @@ class EventController(
         )
 
         return ResponseEntity(event, HttpStatus.CREATED)
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ORGANIZER')")
+    fun updateEvent(
+        @PathVariable id: Long,
+        @Valid @RequestBody request: UpdateEventRequest,
+        authentication: Authentication
+    ): ResponseEntity<Event> {
+
+        val event = eventService.updateEvent(
+            id,
+            request,
+            authentication.name
+        )
+
+        return ResponseEntity.ok(event)
+    }
+
+    @PatchMapping("/{id}/cancel")
+    @PreAuthorize("hasRole('ORGANIZER')")
+    fun cancelEvent(
+        @PathVariable id: Long,
+        authentication: Authentication
+    ): ResponseEntity<Event> {
+
+        val event = eventService.cancelEvent(
+            id,
+            authentication.name
+        )
+
+        return ResponseEntity.ok(event)
     }
 }
