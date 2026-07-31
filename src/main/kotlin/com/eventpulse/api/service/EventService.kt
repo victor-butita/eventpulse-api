@@ -6,8 +6,11 @@ import com.eventpulse.api.entity.Event
 import com.eventpulse.api.entity.EventStatus
 import com.eventpulse.api.repository.EventRepository
 import com.eventpulse.api.repository.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class EventService(
@@ -47,12 +50,17 @@ class EventService(
             .orElseThrow {
                 NoSuchElementException("Event not found")
             }
+        //Debug statements
+        println("Authenticated user: $organizerEmail")
+        println("Event owner: ${event.organizer.email}")
+
 
         if (event.organizer.email != organizerEmail) {
             throw org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.FORBIDDEN,
                 "You are not allowed to update this event."
             )
+
         }
 
         event.title = request.title
@@ -73,6 +81,8 @@ class EventService(
             .orElseThrow {
                 NoSuchElementException("Event not found")
             }
+        println("Authenticated user: $organizerEmail")
+        println("Event owner: ${event.organizer.email}")
 
         if (event.organizer.email != organizerEmail) {
             throw org.springframework.web.server.ResponseStatusException(
@@ -84,5 +94,45 @@ class EventService(
         event.status = EventStatus.CANCELLED
 
         return eventRepository.save(event)
+    }
+
+    fun getEvents(
+        page: Int,
+        size: Int,
+        date: LocalDate?,
+        status: EventStatus?
+    ): Page<Event> {
+
+        val pageable = PageRequest.of(page, size)
+
+        return when {
+
+            status != null && date != null ->
+                eventRepository.findByStatusAndDateBetween(
+                    status,
+                    date.atStartOfDay(),
+                    date.plusDays(1).atStartOfDay(),
+                    pageable
+                )
+
+            status != null ->
+                eventRepository.findByStatus(
+                    status,
+                    pageable
+                )
+
+            date != null ->
+                eventRepository.findByDateBetween(
+                    date.atStartOfDay(),
+                    date.plusDays(1).atStartOfDay(),
+                    pageable
+                )
+
+            else ->
+                eventRepository.findByStatusNot(
+                    EventStatus.CANCELLED,
+                    pageable
+                )
+        }
     }
 }
