@@ -29,7 +29,7 @@ class EventPulseApplicationTests {
     fun contextLoads() {
         assertThat(openApiConfig).isNotNull
         assertThat(openApi.info.title).isEqualTo("EventPulse API")
-        assertThat(openApi.info.version).isEqualTo("v0")
+        assertThat(openApi.info.version).isEqualTo("v1")
     }
 
     @Test
