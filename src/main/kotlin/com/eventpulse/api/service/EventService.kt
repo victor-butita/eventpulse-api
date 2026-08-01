@@ -60,22 +60,24 @@ class EventService(
             )
         }
 
-        if (request.ticketQuota < event.ticketsBooked) {
-            throw ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Ticket quota cannot be less than the number of tickets already booked (${event.ticketsBooked})."
-            )
-        }
+        request.title?.let { event.title = it }
+        request.description?.let { event.description = it }
+        request.date?.let { event.date = it }
+        request.location?.let { event.location = it }
 
-        event.title = request.title
-        event.description = request.description
-        event.date = request.date
-        event.location = request.location
-        event.ticketQuota = request.ticketQuota
+        request.ticketQuota?.let { newQuota ->
+            if (newQuota < event.ticketsBooked) {
+                throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Ticket quota cannot be less than already booked tickets."
+                )
+            }
+
+            event.ticketQuota = newQuota
+        }
 
         return eventRepository.save(event)
     }
-
     fun cancelEvent(
         eventId: Long,
         organizerEmail: String
@@ -138,3 +140,5 @@ class EventService(
         }
     }
 }
+
+

@@ -62,6 +62,7 @@ class EventControllerTest {
         assertEquals(event, response.body)
     }
     @Test
+
     fun updateEventShouldReturnOkResponse() {
 
         val request = UpdateEventRequest(
@@ -81,12 +82,12 @@ class EventControllerTest {
 
         val event = Event(
             id = 1L,
-            title = request.title,
-            description = request.description,
+            title = request.title!!,
+            description = request.description!!,
             organizer = organizer,
-            date = request.date,
-            location = request.location,
-            ticketQuota = request.ticketQuota,
+            date = request.date!!,
+            location = request.location!!,
+            ticketQuota = request.ticketQuota!!,
             ticketsBooked = 0,
             status = EventStatus.OPEN
         )
