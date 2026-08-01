@@ -60,10 +60,24 @@ class EventService(
             )
         }
 
+        request.title?.let { event.title = it }
+        request.description?.let { event.description = it }
+        request.date?.let { event.date = it }
+        request.location?.let { event.location = it }
 
-        return TODO("Provide the return value")
+        request.ticketQuota?.let { newQuota ->
+            if (newQuota < event.ticketsBooked) {
+                throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Ticket quota cannot be less than the number of tickets already booked."
+                )
+            }
+
+            event.ticketQuota = newQuota
+        }
+
+        return eventRepository.save(event)
     }
-
     fun cancelEvent(
         eventId: Long,
         organizerEmail: String
