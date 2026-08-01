@@ -365,6 +365,7 @@ class EventServiceTest {
         }
     }
 
+<<<<<<< HEAD
     @Test
 <<<<<<< HEAD
     fun `should return non cancelled events by default`() {
@@ -460,6 +461,34 @@ class EventServiceTest {
             )
         }
     }
+=======
+   // @Test
+//    fun `should return events filtered by status`() {
+//
+//        val pageable = PageRequest.of(0, 10)
+//
+//        every {
+//            eventRepository.findByStatus(
+//                EventStatus.OPEN,
+//                pageable
+//            )
+//        } returns PageImpl(emptyList())
+//
+//        eventService.getEvents(
+//            0,
+//            10,
+//            null,
+//            EventStatus.OPEN
+//        )
+//
+//        verify {
+//            eventRepository.findByStatus(
+//                EventStatus.OPEN,
+//                pageable
+//            )
+//        }
+//    }
+>>>>>>> 58fd6c4 (extrat test)
     @Test
     fun `should return events filtered by status`() {
 
