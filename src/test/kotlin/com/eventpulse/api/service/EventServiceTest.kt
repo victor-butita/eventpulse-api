@@ -248,6 +248,57 @@ class EventServiceTest {
             eventRepository.save(any())
         }
     }
+    @Test
+    fun `should update only provided fields`() {
+
+        val organizer = User(
+            id = 1L,
+            email = "organizer@test.com",
+            password = "password",
+            role = Role.ORGANIZER
+        )
+
+        val originalDate = LocalDateTime.of(2026, 9, 1, 10, 0)
+
+        val event = Event(
+            id = 1L,
+            title = "Original Title",
+            description = "Original Description",
+            organizer = organizer,
+            date = originalDate,
+            location = "Nairobi",
+            ticketQuota = 100,
+            ticketsBooked = 0,
+            status = EventStatus.OPEN
+        )
+
+        val request = UpdateEventRequest(
+            title = "Updated Title",
+            description = null,
+            date = null,
+            location = null,
+            ticketQuota = null
+        )
+
+        every { eventRepository.findById(1L) } returns Optional.of(event)
+        every { eventRepository.save(any()) } answers { firstArg() }
+
+        val updated = eventService.updateEvent(
+            1L,
+            request,
+            "organizer@test.com"
+        )
+
+        assertEquals("Updated Title", updated.title)
+        assertEquals("Original Description", updated.description)
+        assertEquals(originalDate, updated.date)
+        assertEquals("Nairobi", updated.location)
+        assertEquals(100, updated.ticketQuota)
+
+        verify(exactly = 1) {
+            eventRepository.save(any())
+        }
+    }
 
     @Test
     fun `should throw when cancelling non existing event`() {
