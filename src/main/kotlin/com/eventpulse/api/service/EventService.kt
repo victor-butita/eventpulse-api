@@ -60,10 +60,18 @@ class EventService(
             )
         }
 
+<<<<<<< HEAD
         if (request.ticketQuota < event.ticketsBooked) {
             throw ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Ticket quota cannot be less than the number of tickets already booked (${event.ticketsBooked})."
+=======
+        // Prevent reducing quota below already booked tickets
+        if (request.ticketQuota < event.ticketsBooked) {
+            throw org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Ticket quota cannot be less than already booked tickets."
+>>>>>>> b4f375c (addtional test)
             )
         }
 
