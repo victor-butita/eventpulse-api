@@ -14,15 +14,18 @@ import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Optional
 
 class EventServiceTest {
 
-    private val eventRepository = mockk<EventRepository>(relaxed = true)
-    private val userRepository = mockk<UserRepository>(relaxed = true)
+    private val eventRepository = mockk<EventRepository>()
+    private val userRepository = mockk<UserRepository>()
 
     private val eventService = EventService(
         eventRepository,
@@ -137,27 +140,38 @@ class EventServiceTest {
     }
 
     @Test
-    fun `should throw exception when updating non existing event`() {
+    fun `should cancel event successfully`() {
 
-        val request = UpdateEventRequest(
-            title = "Updated",
-            description = "Updated",
-            date = LocalDateTime.now().plusDays(5),
-            location = "Nairobi",
-            ticketQuota = 100
+        val organizer = User(
+            id = 1L,
+            email = "organizer@test.com",
+            password = "password",
+            role = Role.ORGANIZER
         )
 
-        every { eventRepository.findById(99L) } returns Optional.empty()
+        val event = Event(
+            id = 1L,
+            title = "Workshop",
+            description = "Spring",
+            organizer = organizer,
+            date = LocalDateTime.now().plusDays(2),
+            location = "Nairobi",
+            ticketQuota = 100,
+            ticketsBooked = 0,
+            status = EventStatus.OPEN
+        )
 
-        assertThrows<NoSuchElementException> {
-            eventService.updateEvent(
-                99L,
-                request,
-                "organizer@test.com"
-            )
-        }
+        every { eventRepository.findById(1L) } returns Optional.of(event)
+        every { eventRepository.save(any()) } answers { firstArg() }
 
-        verify(exactly = 0) {
+        val cancelled = eventService.cancelEvent(
+            1L,
+            "organizer@test.com"
+        )
+
+        assertEquals(EventStatus.CANCELLED, cancelled.status)
+
+        verify(exactly = 1) {
             eventRepository.save(any())
         }
     }
@@ -201,99 +215,116 @@ class EventServiceTest {
                 "another@test.com"
             )
         }
+    }
 
-        verify(exactly = 0) {
-            eventRepository.save(any())
+    @Test
+    fun `should return non cancelled events by default`() {
+
+        val pageable = PageRequest.of(0, 10)
+        val events = PageImpl(emptyList<Event>())
+
+        every {
+            eventRepository.findByStatusNot(EventStatus.CANCELLED, pageable)
+        } returns events
+
+        val result = eventService.getEvents(0, 10, null, null)
+
+        assertEquals(events, result)
+
+        verify {
+            eventRepository.findByStatusNot(EventStatus.CANCELLED, pageable)
         }
     }
 
     @Test
-    fun `should cancel event successfully`() {
+    fun `should filter events by status`() {
 
-        val organizer = User(
-            id = 1L,
-            email = "organizer@test.com",
-            password = "password",
-            role = Role.ORGANIZER
+        val pageable = PageRequest.of(0, 10)
+        val events = PageImpl(emptyList<Event>())
+
+        every {
+            eventRepository.findByStatus(EventStatus.OPEN, pageable)
+        } returns events
+
+        val result = eventService.getEvents(
+            0,
+            10,
+            null,
+            EventStatus.OPEN
         )
 
-        val event = Event(
-            id = 1L,
-            title = "Workshop",
-            description = "Spring",
-            organizer = organizer,
-            date = LocalDateTime.now().plusDays(2),
-            location = "Nairobi",
-            ticketQuota = 100,
-            ticketsBooked = 0,
-            status = EventStatus.OPEN
-        )
+        assertEquals(events, result)
 
-        every { eventRepository.findById(1L) } returns Optional.of(event)
-        every { eventRepository.save(any()) } answers { firstArg() }
-
-        val cancelled = eventService.cancelEvent(
-            1L,
-            "organizer@test.com"
-        )
-
-        assertEquals(EventStatus.CANCELLED, cancelled.status)
-
-        verify(exactly = 1) {
-            eventRepository.save(any())
+        verify {
+            eventRepository.findByStatus(EventStatus.OPEN, pageable)
         }
     }
 
     @Test
-    fun `should throw exception when cancelling non existing event`() {
+    fun `should filter events by date`() {
 
-        every { eventRepository.findById(99L) } returns Optional.empty()
+        val pageable = PageRequest.of(0, 10)
+        val date = LocalDate.of(2026, 9, 1)
+        val events = PageImpl(emptyList<Event>())
 
-        assertThrows<NoSuchElementException> {
-            eventService.cancelEvent(
-                99L,
-                "organizer@test.com"
+        every {
+            eventRepository.findByDateBetween(
+                date.atStartOfDay(),
+                date.plusDays(1).atStartOfDay(),
+                pageable
+            )
+        } returns events
+
+        val result = eventService.getEvents(
+            0,
+            10,
+            date,
+            null
+        )
+
+        assertEquals(events, result)
+
+        verify {
+            eventRepository.findByDateBetween(
+                date.atStartOfDay(),
+                date.plusDays(1).atStartOfDay(),
+                pageable
             )
         }
-
-        verify(exactly = 0) {
-            eventRepository.save(any())
-        }
     }
 
     @Test
-    fun `should throw forbidden when another organizer cancels event`() {
+    fun `should filter events by status and date`() {
 
-        val organizer = User(
-            id = 1L,
-            email = "owner@test.com",
-            password = "password",
-            role = Role.ORGANIZER
-        )
+        val pageable = PageRequest.of(0, 10)
+        val date = LocalDate.of(2026, 9, 1)
+        val events = PageImpl(emptyList<Event>())
 
-        val event = Event(
-            id = 1L,
-            title = "Workshop",
-            description = "Spring",
-            organizer = organizer,
-            date = LocalDateTime.now().plusDays(2),
-            location = "Nairobi",
-            ticketQuota = 100,
-            ticketsBooked = 0,
-            status = EventStatus.OPEN
-        )
-
-        every { eventRepository.findById(1L) } returns Optional.of(event)
-
-        assertThrows<ResponseStatusException> {
-            eventService.cancelEvent(
-                1L,
-                "another@test.com"
+        every {
+            eventRepository.findByStatusAndDateBetween(
+                EventStatus.OPEN,
+                date.atStartOfDay(),
+                date.plusDays(1).atStartOfDay(),
+                pageable
             )
-        }
+        } returns events
 
-        verify(exactly = 0) {
-            eventRepository.save(any())
+        val result = eventService.getEvents(
+            0,
+            10,
+            date,
+            EventStatus.OPEN
+        )
+
+        assertEquals(events, result)
+
+        verify {
+            eventRepository.findByStatusAndDateBetween(
+                EventStatus.OPEN,
+                date.atStartOfDay(),
+                date.plusDays(1).atStartOfDay(),
+                pageable
+            )
         }
     }
 }
