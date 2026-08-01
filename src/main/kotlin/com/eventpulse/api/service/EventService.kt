@@ -69,7 +69,7 @@ class EventService(
             if (newQuota < event.ticketsBooked) {
                 throw ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Ticket quota cannot be less than the number of tickets already booked."
+                    "Ticket quota cannot be less than already booked tickets."
                 )
             }
 
