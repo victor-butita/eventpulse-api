@@ -8,8 +8,10 @@ import com.eventpulse.api.repository.EventRepository
 import com.eventpulse.api.repository.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 
 @Service
@@ -50,17 +52,19 @@ class EventService(
             .orElseThrow {
                 NoSuchElementException("Event not found")
             }
-        //Debug statements
-        println("Authenticated user: $organizerEmail")
-        println("Event owner: ${event.organizer.email}")
-
 
         if (event.organizer.email != organizerEmail) {
-            throw org.springframework.web.server.ResponseStatusException(
-                org.springframework.http.HttpStatus.FORBIDDEN,
+            throw ResponseStatusException(
+                HttpStatus.FORBIDDEN,
                 "You are not allowed to update this event."
             )
+        }
 
+        if (request.ticketQuota < event.ticketsBooked) {
+            throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Ticket quota cannot be less than the number of tickets already booked (${event.ticketsBooked})."
+            )
         }
 
         event.title = request.title
@@ -81,12 +85,10 @@ class EventService(
             .orElseThrow {
                 NoSuchElementException("Event not found")
             }
-        println("Authenticated user: $organizerEmail")
-        println("Event owner: ${event.organizer.email}")
 
         if (event.organizer.email != organizerEmail) {
-            throw org.springframework.web.server.ResponseStatusException(
-                org.springframework.http.HttpStatus.FORBIDDEN,
+            throw ResponseStatusException(
+                HttpStatus.FORBIDDEN,
                 "You are not allowed to cancel this event."
             )
         }
