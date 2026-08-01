@@ -141,4 +141,4 @@ class EventService(
     }
 }
 
-    fun cancelEvent(lng: Long, string: String) {}
+
