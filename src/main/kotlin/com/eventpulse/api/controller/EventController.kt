@@ -13,10 +13,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
+
 
 @RestController
-@SecurityRequirement(name = "Bearer Authentication")
 @RequestMapping("/api/events")
 class EventController(
     private val eventService: EventService
@@ -52,6 +51,7 @@ class EventController(
 
     @PostMapping
     @PreAuthorize("hasRole('ORGANIZER')")
+
     fun createEvent(
         @Valid @RequestBody request: CreateEventRequest,
         authentication: Authentication
@@ -67,6 +67,7 @@ class EventController(
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ORGANIZER')")
+
     fun updateEvent(
         @PathVariable id: Long,
         @Valid @RequestBody request: UpdateEventRequest,
@@ -84,6 +85,7 @@ class EventController(
 
     @PatchMapping("/{id}/cancel")
     @PreAuthorize("hasRole('ORGANIZER')")
+
     fun cancelEvent(
         @PathVariable id: Long,
         authentication: Authentication
