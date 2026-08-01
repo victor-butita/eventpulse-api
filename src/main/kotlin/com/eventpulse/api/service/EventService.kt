@@ -60,28 +60,8 @@ class EventService(
             )
         }
 
-<<<<<<< HEAD
-        if (request.ticketQuota < event.ticketsBooked) {
-            throw ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Ticket quota cannot be less than the number of tickets already booked (${event.ticketsBooked})."
-=======
-        // Prevent reducing quota below already booked tickets
-        if (request.ticketQuota < event.ticketsBooked) {
-            throw org.springframework.web.server.ResponseStatusException(
-                org.springframework.http.HttpStatus.BAD_REQUEST,
-                "Ticket quota cannot be less than already booked tickets."
->>>>>>> b4f375c (addtional test)
-            )
-        }
 
-        event.title = request.title
-        event.description = request.description
-        event.date = request.date
-        event.location = request.location
-        event.ticketQuota = request.ticketQuota
-
-        return eventRepository.save(event)
+        return TODO("Provide the return value")
     }
 
     fun cancelEvent(
@@ -146,3 +126,5 @@ class EventService(
         }
     }
 }
+
+    fun cancelEvent(lng: Long, string: String) {}

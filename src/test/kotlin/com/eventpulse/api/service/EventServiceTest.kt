@@ -12,13 +12,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDate
+
 import java.time.LocalDateTime
 import java.util.Optional
 import org.springframework.data.domain.PageImpl
@@ -365,9 +364,8 @@ class EventServiceTest {
         }
     }
 
-<<<<<<< HEAD
+
     @Test
-<<<<<<< HEAD
     fun `should return non cancelled events by default`() {
 
         val pageable = PageRequest.of(0, 10)
@@ -393,38 +391,28 @@ class EventServiceTest {
         val events = PageImpl(emptyList<Event>())
 
         every {
-            eventRepository.findByStatus(EventStatus.OPEN, pageable)
-        } returns events
-
-        val result = eventService.getEvents(
-=======
-    fun `should return events filtered by status`() {
-
-        val pageable = PageRequest.of(0, 10)
-
-        every {
             eventRepository.findByStatus(
                 EventStatus.OPEN,
                 pageable
             )
-        } returns PageImpl(emptyList())
+        } returns events
 
-        eventService.getEvents(
->>>>>>> b4f375c (addtional test)
+        val result = eventService.getEvents(
             0,
             10,
             null,
             EventStatus.OPEN
         )
 
-<<<<<<< HEAD
         assertEquals(events, result)
 
         verify {
-            eventRepository.findByStatus(EventStatus.OPEN, pageable)
+            eventRepository.findByStatus(
+                EventStatus.OPEN,
+                pageable
+            )
         }
     }
-
     @Test
     fun `should filter events by date`() {
 
@@ -453,15 +441,11 @@ class EventServiceTest {
             eventRepository.findByDateBetween(
                 date.atStartOfDay(),
                 date.plusDays(1).atStartOfDay(),
-=======
-        verify {
-            eventRepository.findByStatus(
-                EventStatus.OPEN,
                 pageable
             )
         }
     }
-=======
+
    // @Test
 //    fun `should return events filtered by status`() {
 //
@@ -488,55 +472,48 @@ class EventServiceTest {
 //            )
 //        }
 //    }
->>>>>>> 58fd6c4 (extrat test)
-    @Test
-    fun `should return events filtered by status`() {
 
-        val pageable = PageRequest.of(0, 10)
+        @Test
+        fun `should return events filtered by status`() {
 
-        every {
-            eventRepository.findByStatus(
-                EventStatus.OPEN,
-                pageable
+            val pageable = PageRequest.of(0, 10)
+            val events = PageImpl(emptyList<Event>())
+
+            every {
+                eventRepository.findByStatus(
+                    EventStatus.OPEN,
+                    pageable
+                )
+            } returns events
+
+            val result = eventService.getEvents(
+                0,
+                10,
+                null,
+                EventStatus.OPEN
             )
-        } returns PageImpl(emptyList())
 
-        eventService.getEvents(
-            0,
-            10,
-            null,
-            EventStatus.OPEN
-        )
+            assertEquals(events, result)
 
-        verify {
-            eventRepository.findByStatus(
-                EventStatus.OPEN,
->>>>>>> b4f375c (addtional test)
-                pageable
-            )
+            verify {
+                eventRepository.findByStatus(
+                    EventStatus.OPEN,
+                    pageable
+                )
+            }
         }
-    }
-<<<<<<< HEAD
 
-    @Test
-    fun `should filter events by status and date`() {
 
-        val pageable = PageRequest.of(0, 10)
-        val date = LocalDate.of(2026, 9, 1)
-        val events = PageImpl(emptyList<Event>())
-=======
     @Test
     fun `should return events filtered by status and date`() {
 
         val pageable = PageRequest.of(0, 10)
-
         val date = LocalDate.of(2026, 9, 1)
->>>>>>> b4f375c (addtional test)
+        val events = PageImpl(emptyList<Event>())
 
         every {
             eventRepository.findByStatusAndDateBetween(
                 EventStatus.OPEN,
-<<<<<<< HEAD
                 date.atStartOfDay(),
                 date.plusDays(1).atStartOfDay(),
                 pageable
@@ -544,22 +521,12 @@ class EventServiceTest {
         } returns events
 
         val result = eventService.getEvents(
-=======
-                any(),
-                any(),
-                pageable
-            )
-        } returns PageImpl(emptyList())
-
-        eventService.getEvents(
->>>>>>> b4f375c (addtional test)
             0,
             10,
             date,
             EventStatus.OPEN
         )
 
-<<<<<<< HEAD
         assertEquals(events, result)
 
         verify {
@@ -567,13 +534,6 @@ class EventServiceTest {
                 EventStatus.OPEN,
                 date.atStartOfDay(),
                 date.plusDays(1).atStartOfDay(),
-=======
-        verify {
-            eventRepository.findByStatusAndDateBetween(
-                EventStatus.OPEN,
-                any(),
-                any(),
->>>>>>> b4f375c (addtional test)
                 pageable
             )
         }
