@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 005-create-bookings-table
+      id: 004-create-bookings-table
       author: oduor-antony
 
       changes:
