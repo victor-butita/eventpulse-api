@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 003-add-events-table
-      author: oduor-antony
+      author: Antony Ochieng
       changes:
         - createTable:
             tableName: events
