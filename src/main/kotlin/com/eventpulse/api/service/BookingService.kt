@@ -24,7 +24,9 @@ class BookingService(
     ): Booking {
 
         val event = eventRepository.findById(eventId)
-            .orElseThrow { NoSuchElementException("Event not found") }
+            .orElseThrow {
+                NoSuchElementException("Event not found")
+            }
 
         val attendee = userRepository.findByEmail(attendeeEmail)
             ?: throw UsernameNotFoundException("Attendee not found")

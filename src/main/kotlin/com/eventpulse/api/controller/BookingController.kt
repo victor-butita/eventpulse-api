@@ -2,7 +2,6 @@ package com.eventpulse.api.controller
 
 import com.eventpulse.api.entity.Booking
 import com.eventpulse.api.service.BookingService
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -18,6 +17,7 @@ class BookingController(
 
     @PostMapping("/{id}/book")
     @PreAuthorize("hasRole('ATTENDEE')")
+
     fun bookEvent(
         @PathVariable id: Long,
         authentication: Authentication
