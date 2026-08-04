@@ -145,6 +145,7 @@ class BookingServiceTest {
     }
 
     @Test
+
     fun `should reject booking when event is closed`() {
 
         val attendee = User(
@@ -176,14 +177,17 @@ class BookingServiceTest {
         every { eventRepository.findById(1L) } returns Optional.of(event)
         every { userRepository.findByEmail(any()) } returns attendee
 
-        val exception = assertThrows<ResponseStatusException> {
+        val exception = assertThrows<IllegalArgumentException> {
             bookingService.bookEvent(1L, attendee.email!!)
         }
 
-        assertEquals(HttpStatus.BAD_REQUEST, exception.statusCode)
+        assertEquals("Event is not open for booking.", exception.message)
+
+        verify(exactly = 0) { bookingRepository.save(any()) }
     }
 
     @Test
+
     fun `should reject booking when event is sold out`() {
 
         val attendee = User(
@@ -215,11 +219,12 @@ class BookingServiceTest {
         every { eventRepository.findById(1L) } returns Optional.of(event)
         every { userRepository.findByEmail(any()) } returns attendee
 
-        val exception = assertThrows<ResponseStatusException> {
+        val exception = assertThrows<IllegalArgumentException> {
             bookingService.bookEvent(1L, attendee.email!!)
         }
 
-        assertEquals(HttpStatus.BAD_REQUEST, exception.statusCode)
-        assertEquals("Event is sold out.", exception.reason)
+        assertEquals("Event is sold out.", exception.message)
+
+        verify(exactly = 0) { bookingRepository.save(any()) }
     }
 }

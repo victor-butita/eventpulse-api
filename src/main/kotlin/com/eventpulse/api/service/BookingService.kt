@@ -3,6 +3,7 @@ package com.eventpulse.api.service
 import com.eventpulse.api.entity.Booking
 import com.eventpulse.api.entity.BookingStatus
 import com.eventpulse.api.entity.EventStatus
+import com.eventpulse.api.entity.Role
 import com.eventpulse.api.repository.BookingRepository
 import com.eventpulse.api.repository.EventRepository
 import com.eventpulse.api.repository.UserRepository
@@ -45,7 +46,7 @@ class BookingService(
                 ?: throw UsernameNotFoundException("Attendee not found.")
 
             // Only attendees are allowed to book events.
-            if (attendee.role.name != "ATTENDEE") {
+            if (attendee.role != Role.ATTENDEE) {
                 throw ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "Only attendees can book events."
