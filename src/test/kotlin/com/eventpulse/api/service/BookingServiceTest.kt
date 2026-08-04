@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus
+import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
@@ -145,6 +146,7 @@ class BookingServiceTest {
     }
 
     @Test
+
     fun `should reject booking when event is closed`() {
 
         val attendee = User(
@@ -176,14 +178,17 @@ class BookingServiceTest {
         every { eventRepository.findById(1L) } returns Optional.of(event)
         every { userRepository.findByEmail(any()) } returns attendee
 
-        val exception = assertThrows<ResponseStatusException> {
+        val exception = assertThrows<IllegalArgumentException> {
             bookingService.bookEvent(1L, attendee.email!!)
         }
 
-        assertEquals(HttpStatus.BAD_REQUEST, exception.statusCode)
+        assertEquals("Event is not open for booking.", exception.message)
+
+        verify(exactly = 0) { bookingRepository.save(any()) }
     }
 
     @Test
+
     fun `should reject booking when event is sold out`() {
 
         val attendee = User(
@@ -215,11 +220,67 @@ class BookingServiceTest {
         every { eventRepository.findById(1L) } returns Optional.of(event)
         every { userRepository.findByEmail(any()) } returns attendee
 
+        val exception = assertThrows<IllegalArgumentException> {
+            bookingService.bookEvent(1L, attendee.email!!)
+        }
+
+        assertEquals("Event is sold out.", exception.message)
+
+        verify(exactly = 0) { bookingRepository.save(any()) }
+    }
+
+    @Test
+    fun `should throw exception when event is not found`() {
+
+        every { eventRepository.findById(1L) } returns Optional.empty()
+
+        val exception = assertThrows<IllegalArgumentException> {
+            bookingService.bookEvent(1L, "attendee@test.com")
+        }
+
+        assertEquals("Event not found.", exception.message)
+    }
+
+    @Test
+    fun `should return conflict when optimistic locking occurs`() {
+
+        val attendee = User(
+            id = 1L,
+            email = "attendee@test.com",
+            password = "password",
+            role = Role.ATTENDEE
+        )
+
+        val organizer = User(
+            id = 2L,
+            email = "organizer@test.com",
+            password = "password",
+            role = Role.ORGANIZER
+        )
+
+        val event = Event(
+            id = 1L,
+            title = "Workshop",
+            description = "Spring",
+            organizer = organizer,
+            date = LocalDateTime.now().plusDays(2),
+            location = "Nairobi",
+            ticketQuota = 100,
+            ticketsBooked = 0,
+            status = EventStatus.OPEN
+        )
+
+        every { eventRepository.findById(1L) } returns Optional.of(event)
+        every { userRepository.findByEmail(any()) } returns attendee
+
+        every {
+            eventRepository.save(any())
+        } throws ObjectOptimisticLockingFailureException(Event::class.java, 1L)
+
         val exception = assertThrows<ResponseStatusException> {
             bookingService.bookEvent(1L, attendee.email!!)
         }
 
-        assertEquals(HttpStatus.BAD_REQUEST, exception.statusCode)
-        assertEquals("Event is sold out.", exception.reason)
+        assertEquals(HttpStatus.CONFLICT, exception.statusCode)
     }
 }
