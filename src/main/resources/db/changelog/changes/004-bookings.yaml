@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: 004-create-bookings-table
-      author: oduor-antony
+      id: 005-create-bookings-table
+      author: antony
 
       changes:
         - createTable:
@@ -30,7 +30,7 @@ databaseChangeLog:
 
               - column:
                   name: status
-                  type: VARCHAR(50)
+                  type: VARCHAR(20)
                   constraints:
                     nullable: false
 
