@@ -1,6 +1,7 @@
 package com.eventpulse.api.entity
 
 import jakarta.persistence.Column
+import jakarta.persistence.Version
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -43,5 +44,9 @@ class Event(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: EventStatus = EventStatus.OPEN
+    var status: EventStatus = EventStatus.OPEN,
+
+    @Version
+    @Column(nullable = false)
+    var version: Long = 0
 )

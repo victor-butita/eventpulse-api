@@ -8,15 +8,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-    @ExceptionHandler(IllegalArgumentException::class)
-    fun handleIllegalArgument(ex: IllegalArgumentException): ResponseEntity<Map<String, String>> {
+    @RestControllerAdvice
+    class GlobalExceptionHandler {
 
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(
+        @ExceptionHandler(IllegalArgumentException::class)
+        fun handleIllegalArgument(ex: IllegalArgumentException): ResponseEntity<Map<String, String>> {
+
+            return ResponseEntity.badRequest().body(
                 mapOf(
+                    "error" to "Bad Request",
                     "message" to ex.message.orEmpty()
                 )
             )
+        }
     }
 }
