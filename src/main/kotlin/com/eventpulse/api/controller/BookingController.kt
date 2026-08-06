@@ -9,7 +9,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/events")
+@RequestMapping("/api/booking")
 //@SecurityRequirement(name = "Bearer Authentication")
 class BookingController(
     private val bookingService: BookingService
@@ -26,5 +26,20 @@ class BookingController(
         val booking = bookingService.bookEvent(id, authentication.name)
 
         return ResponseEntity.status(HttpStatus.CREATED).body(booking)
+    }
+
+    @PatchMapping("/{id}/cancel")
+    @PreAuthorize("hasRole('ATTENDEE')")
+    fun cancelBooking(
+        @PathVariable id: Long,
+        authentication: Authentication
+    ): ResponseEntity<Booking> {
+
+        val booking = bookingService.cancelBooking(
+            id,
+            authentication.name
+        )
+
+        return ResponseEntity.ok(booking)
     }
 }
