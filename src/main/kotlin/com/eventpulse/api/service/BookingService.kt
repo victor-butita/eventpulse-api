@@ -85,4 +85,43 @@ class BookingService(
             )
         }
     }
+
+    @Transactional
+    fun cancelBooking(
+        bookingId: Long,
+        attendeeEmail: String
+    ): Booking {
+
+        val booking = bookingRepository.findById(bookingId)
+            .orElseThrow {
+                IllegalArgumentException("Booking not found.")
+            }
+
+        if (booking.attendee.email != attendeeEmail) {
+            throw ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "You can only cancel your own booking."
+            )
+        }
+
+        if (booking.status == BookingStatus.CANCELLED) {
+            throw IllegalArgumentException("Booking is already cancelled.")
+        }
+
+        booking.status = BookingStatus.CANCELLED
+
+        val event = eventRepository.findById(booking.event.id!!)
+            .orElseThrow {
+                IllegalArgumentException("Event not found.")
+            }
+
+        if (event.ticketsBooked > 0) {
+            event.ticketsBooked--
+        }
+
+        eventRepository.save(event)
+        println("After save: ${booking.event.ticketsBooked}")
+
+        return bookingRepository.save(booking)
+    }
 }
