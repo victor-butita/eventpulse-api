@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: 005-add-event-version
-      author: oduor-antony
+      id: 004-add-version-to-events
+      author: Oduor-Antony
       changes:
         - addColumn:
             tableName: events

@@ -8,6 +8,7 @@ databaseChangeLog:
       file: db/changelog/changes/003-add-events-table.yaml
 
   - include:
-      file: db/changelog/changes/004-create-bookings.yaml
+      file: db/changelog/changes/004-create-bookings-table.yaml
+
   - include:
-      file: db/changelog/changes/005-add-event-version.yaml
+      file: db/changelog/changes/005-add-version-to-events.yaml
