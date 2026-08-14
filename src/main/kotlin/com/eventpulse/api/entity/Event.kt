@@ -10,6 +10,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import jakarta.persistence.Version
 import java.time.LocalDateTime
 
 @Entity
@@ -43,5 +44,9 @@ class Event(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: EventStatus = EventStatus.OPEN
+    var status: EventStatus = EventStatus.OPEN,
+
+    @Version
+    @Column(nullable = false)
+    var version: Long = 0
 )

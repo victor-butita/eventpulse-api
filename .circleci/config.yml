@@ -3,19 +3,24 @@ version: 2.1
 jobs:
   build-test-scan:
     docker:
-      - image: cimg/openjdk:17.0
+      - image: cimg/openjdk:21.0
+
     steps:
       - checkout
+
       - restore_cache:
           keys:
             - maven-deps-{{ checksum "pom.xml" }}
+
       - run:
           name: Build and run tests
-          command: mvn clean verify
+          command: /mvnw clean verify
+
       - save_cache:
           paths:
             - ~/.m2
           key: maven-deps-{{ checksum "pom.xml" }}
+
       - run:
           name: SonarQube Cloud scan
           command: |
@@ -23,8 +28,10 @@ jobs:
               echo "Missing CircleCI env vars: SONAR_TOKEN, SONAR_PROJECT_KEY, SONAR_ORGANIZATION"
               exit 1
             fi
+
             echo "Sonar org=${SONAR_ORGANIZATION} projectKey=${SONAR_PROJECT_KEY} token_set=yes"
-            mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+
+            ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
               -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
               -Dsonar.organization=${SONAR_ORGANIZATION} \
               -Dsonar.host.url=https://sonarcloud.io \
@@ -34,4 +41,6 @@ jobs:
 workflows:
   build-test-scan:
     jobs:
-      - build-test-scan
+      - build-test-scan:
+          context:
+            - eventpulse-mail
