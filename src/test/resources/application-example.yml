@@ -1,15 +1,13 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:eventpulse;MODE=MySQL
+    url: jdbc:h2:mem:eventpulse;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
     username: sa
     password:
     driver-class-name: org.h2.Driver
-
   jpa:
     hibernate:
       ddl-auto: validate
     database-platform: org.hibernate.dialect.H2Dialect
-
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}
@@ -21,15 +19,9 @@ spring:
           auth: true
           starttls:
             enable: true
-
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
-
   h2:
     console:
       enabled: false
-
-jwt:
-  secret: test-secret-key-for-eventpulse
-  expiration: 86400000
