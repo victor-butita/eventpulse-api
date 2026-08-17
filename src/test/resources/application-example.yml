@@ -1,16 +1,29 @@
 spring:
+  application:
+    name: eventpulse-api
+
   datasource:
-    url: jdbc:h2:mem:eventpulse;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:mariadb://localhost:3306/eventpulse}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:Anto$2026}
+    driver-class-name: org.mariadb.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: validate
-    database-platform: org.hibernate.dialect.H2Dialect
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
+
   mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
+    host: smtp.gmail.com
+    port: 587
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
     properties:
@@ -19,9 +32,6 @@ spring:
           auth: true
           starttls:
             enable: true
-  liquibase:
-    enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.yaml
-  h2:
-    console:
-      enabled: false
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
