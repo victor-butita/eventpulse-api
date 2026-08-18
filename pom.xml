@@ -31,6 +31,7 @@
         <sonar.coverage.exclusions>
             **/EventPulseApplication.kt
         </sonar.coverage.exclusions>
+        <sonar.maven.plugin.version>5.1.0.4751</sonar.maven.plugin.version>
     </properties>
 
     <dependencies>
