@@ -2,8 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Spring Boot -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -11,55 +13,150 @@
         <relativePath/>
     </parent>
 
+    <!-- Project information -->
     <groupId>com.eventpulse</groupId>
     <artifactId>eventpulse-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+
     <name>eventpulse-api</name>
     <description>EventPulse — concurrent-safe event ticketing API</description>
 
+    <!-- ========================================================= -->
+    <!-- Properties -->
+    <!-- ========================================================= -->
     <properties>
+        <!-- JDK -->
         <java.version>17</java.version>
+
+        <!-- Kotlin -->
         <kotlin.version>1.9.25</kotlin.version>
+
+        <!-- SpringDoc -->
         <springdoc.version>2.6.0</springdoc.version>
+
+        <!-- JaCoCo -->
         <jacoco.version>0.8.12</jacoco.version>
-        <!-- Merged with JaCoCo agent via @{argLine} -->
+
+        <!-- Test profile -->
         <argLine>-Dspring.profiles.active=test</argLine>
+
+        <!-- SonarQube -->
         <sonar.coverage.jacoco.xmlReportPaths>
             ${project.build.directory}/site/jacoco/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
-        <!-- main() entrypoint is not exercised by tests -->
+
         <sonar.coverage.exclusions>
             **/EventPulseApplication.kt
         </sonar.coverage.exclusions>
         <sonar.maven.plugin.version>5.1.0.4751</sonar.maven.plugin.version>
     </properties>
 
+    <!-- ========================================================= -->
+    <!-- Dependencies -->
+    <!-- ========================================================= -->
     <dependencies>
+
+        <!-- Spring Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <!-- Spring Data JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
+        <!-- Validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- Email / SMTP -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+        <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
+        <!-- Liquibase -->
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
+        </dependency>
+
+        <!-- MariaDB -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- SpringDoc / Swagger -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- ===================================================== -->
+        <!-- Kotlin -->
+        <!-- ===================================================== -->
+
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+        </dependency>
+
+        <!-- ===================================================== -->
+        <!-- JWT -->
+        <!-- ===================================================== -->
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ===================================================== -->
+        <!-- Testing -->
+        <!-- ===================================================== -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- MockK -->
@@ -70,126 +167,127 @@
             <scope>test</scope>
         </dependency>
 
-
-
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-kotlin</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-
-        <!-- JWT API -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>0.12.6</version>
-        </dependency>
-
-        <!-- JWT Implementation -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>0.12.6</version>
-            <scope>runtime</scope>
-        </dependency>
-
-        <!-- JSON Serializer for JWT -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <version>0.12.6</version>
-            <scope>runtime</scope>
-        </dependency>
-
-
+        <!-- Kotlin JUnit 5 -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit5</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- H2 for tests -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
+    <!-- ========================================================= -->
+    <!-- Build -->
+    <!-- ========================================================= -->
+
     <build>
-        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+
+        <sourceDirectory>
+            ${project.basedir}/src/main/kotlin
+        </sourceDirectory>
+
+        <testSourceDirectory>
+            ${project.basedir}/src/test/kotlin
+        </testSourceDirectory>
+
         <plugins>
+
+            <!-- ================================================= -->
+            <!-- Spring Boot -->
+            <!-- ================================================= -->
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+            <!-- ================================================= -->
+            <!-- Kotlin -->
+            <!-- ================================================= -->
+
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+
                 <configuration>
+
+                    <!-- JDK 17 -->
+                    <jvmTarget>17</jvmTarget>
+
+                    <javaParameters>true</javaParameters>
+
                     <args>
                         <arg>-Xjsr305=strict</arg>
                     </args>
+
+                    <!-- Kotlin Spring/JPA plugins -->
                     <compilerPlugins>
                         <plugin>spring</plugin>
                         <plugin>jpa</plugin>
                     </compilerPlugins>
+
                 </configuration>
+
                 <dependencies>
+
+                    <!-- Kotlin Spring / all-open -->
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>
                         <artifactId>kotlin-maven-allopen</artifactId>
                         <version>${kotlin.version}</version>
                     </dependency>
+
+                    <!-- Kotlin JPA / no-arg -->
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>
                         <artifactId>kotlin-maven-noarg</artifactId>
                         <version>${kotlin.version}</version>
                     </dependency>
+
                 </dependencies>
             </plugin>
+
+            <!-- ================================================= -->
+            <!-- Surefire -->
+            <!-- ================================================= -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+
                 <configuration>
                     <argLine>@{argLine}</argLine>
                 </configuration>
             </plugin>
+
+            <!-- ================================================= -->
+            <!-- JaCoCo -->
+            <!-- ================================================= -->
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
+
                 <executions>
+
+                    <!-- Attach JaCoCo agent -->
                     <execution>
                         <id>prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
+
+                    <!-- Generate report -->
                     <execution>
                         <id>report</id>
                         <phase>verify</phase>
@@ -197,16 +295,20 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
+
+                    <!-- Coverage check -->
                     <execution>
                         <id>jacoco-check</id>
                         <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
+
                         <configuration>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
+
                                     <limits>
                                         <limit>
                                             <counter>LINE</counter>
@@ -214,19 +316,30 @@
                                             <minimum>0.80</minimum>
                                         </limit>
                                     </limits>
+
                                 </rule>
                             </rules>
                         </configuration>
                     </execution>
+
                 </executions>
+
+                <!-- Exclude application entry point -->
                 <configuration>
                     <excludes>
-                        <!-- Boot entrypoint; covered by runtime, not unit tests -->
-                        <exclude>com/eventpulse/api/EventPulseApplicationKt.class</exclude>
-                        <exclude>com/eventpulse/api/EventPulseApplication.class</exclude>
+                        <exclude>
+                            com/eventpulse/api/EventPulseApplicationKt.class
+                        </exclude>
+                        <exclude>
+                            com/eventpulse/api/EventPulseApplication.class
+                        </exclude>
                     </excludes>
                 </configuration>
+
             </plugin>
+
         </plugins>
+
     </build>
+
 </project>

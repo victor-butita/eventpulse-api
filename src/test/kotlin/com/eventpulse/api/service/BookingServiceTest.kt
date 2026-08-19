@@ -26,11 +26,13 @@ class BookingServiceTest {
     private val bookingRepository = mockk<BookingRepository>()
     private val eventRepository = mockk<EventRepository>()
     private val userRepository = mockk<UserRepository>()
+    private val emailService = mockk<EmailService>(relaxed = true)
 
     private val bookingService = BookingService(
         bookingRepository,
         eventRepository,
-        userRepository
+        userRepository,
+        emailService
     )
 
     @Test
@@ -79,6 +81,10 @@ class BookingServiceTest {
 
         verify(exactly = 1) { bookingRepository.save(any()) }
         verify(exactly = 1) { eventRepository.save(any()) }
+
+        verify(exactly = 1) {
+            emailService.sendBookingConfirmation(any())
+        }
     }
 
     @Test
