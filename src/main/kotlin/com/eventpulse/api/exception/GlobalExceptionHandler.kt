@@ -3,6 +3,7 @@ package com.eventpulse.api.exception
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -64,6 +65,24 @@ class GlobalExceptionHandler {
                     "status" to HttpStatus.BAD_REQUEST.value(),
                     "error" to "Bad Request",
                     "message" to (ex.message ?: "Invalid request"),
+                    "path" to request.requestURI
+                )
+            )
+    }
+
+    @ExceptionHandler(AccessDeniedException::class)
+    fun handleAccessDeniedException(
+        ex: AccessDeniedException,
+        request: HttpServletRequest
+    ): ResponseEntity<Map<String, Any>> {
+
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(
+                mapOf(
+                    "status" to HttpStatus.FORBIDDEN.value(),
+                    "error" to "Forbidden",
+                    "message" to "You do not have permission to access this resource",
                     "path" to request.requestURI
                 )
             )
