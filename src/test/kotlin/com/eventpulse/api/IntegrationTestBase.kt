@@ -1,14 +1,16 @@
 package com.eventpulse.api
 
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.MariaDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @SpringBootTest
+@ActiveProfiles("test")
 abstract class IntegrationTestBase {
 
     companion object {
@@ -41,6 +43,12 @@ abstract class IntegrationTestBase {
                 "spring.datasource.driver-class-name"
             ) {
                 "org.mariadb.jdbc.Driver"
+            }
+
+            registry.add(
+                "spring.jpa.database-platform"
+            ) {
+                "org.hibernate.dialect.MariaDBDialect"
             }
 
             registry.add(

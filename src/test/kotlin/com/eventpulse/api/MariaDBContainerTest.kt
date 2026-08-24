@@ -1,4 +1,3 @@
-
 package com.eventpulse.api
 
 import org.junit.jupiter.api.Test
@@ -19,7 +18,6 @@ class MariaDBContainerTest : IntegrationTestBase() {
 
     @Test
     fun `should connect to MariaDB`() {
-
         val result = jdbcTemplate.queryForObject(
             "SELECT 1",
             Int::class.java
@@ -28,4 +26,3 @@ class MariaDBContainerTest : IntegrationTestBase() {
         assertEquals(1, result)
     }
 }
-

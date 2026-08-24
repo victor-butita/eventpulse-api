@@ -2,11 +2,22 @@ version: 2.1
 
 jobs:
   build-test-scan:
-    docker:
-      - image: cimg/openjdk:17.0
+    # Machine executor provides a local Docker daemon so Testcontainers
+    # (MariaDBContainerTest) can start MariaDB. The Docker executor cannot.
+    machine:
+      image: ubuntu-2204:current
+    resource_class: medium
 
     steps:
       - checkout
+
+      - run:
+          name: Install OpenJDK 17
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y openjdk-17-jdk
+            echo 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64' >> "$BASH_ENV"
+            echo 'export PATH=$JAVA_HOME/bin:$PATH' >> "$BASH_ENV"
 
       - restore_cache:
           keys:
@@ -14,7 +25,10 @@ jobs:
 
       - run:
           name: Build and run tests
-          command: ./mvnw clean verify
+          no_output_timeout: 20m
+          command: |
+            java -version
+            ./mvnw clean verify
 
       - save_cache:
           paths:
