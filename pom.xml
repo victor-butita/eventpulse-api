@@ -34,6 +34,9 @@
         <!-- SpringDoc -->
         <springdoc.version>2.6.0</springdoc.version>
 
+        <!-- Testcontainers -->
+        <testcontainers.version>1.20.6</testcontainers.version>
+
         <!-- JaCoCo -->
         <jacoco.version>0.8.12</jacoco.version>
 
@@ -48,6 +51,7 @@
         <sonar.coverage.exclusions>
             **/EventPulseApplication.kt
         </sonar.coverage.exclusions>
+
         <sonar.maven.plugin.version>5.1.0.4751</sonar.maven.plugin.version>
     </properties>
 
@@ -164,6 +168,21 @@
             <groupId>io.mockk</groupId>
             <artifactId>mockk-jvm</artifactId>
             <version>1.13.16</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Testcontainers -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mariadb</artifactId>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
 
