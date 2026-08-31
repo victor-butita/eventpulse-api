@@ -3,13 +3,16 @@ version: 2.1
 jobs:
   build-test-scan:
     # Machine executor provides a local Docker daemon so Testcontainers
-    # (MariaDBContainerTest) can start MariaDB. The Docker executor cannot.
+    # (MySQLContainerTest) can start MySQL 8. The Docker executor cannot.
     machine:
       image: ubuntu-2204:current
     resource_class: medium
 
     steps:
-      - checkout
+      # Blobless (CircleCI default) omits historical blobs. Sonar SCM blame uses
+      # JGit, which cannot lazy-fetch them → MissingObjectException / Missing blob.
+      - checkout:
+          method: full
 
       - run:
           name: Install OpenJDK 17
@@ -45,12 +48,13 @@ jobs:
 
             echo "Sonar org=${SONAR_ORGANIZATION} projectKey=${SONAR_PROJECT_KEY} token_set=yes"
 
-            ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            ./mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:5.1.0.4751:sonar \
               -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
               -Dsonar.organization=${SONAR_ORGANIZATION} \
               -Dsonar.host.url=https://sonarcloud.io \
               -Dsonar.token=${SONAR_TOKEN} \
-              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+              -Dsonar.scm.use.blame.algorithm=GIT_NATIVE_BLAME
 
 workflows:
   build-test-scan:

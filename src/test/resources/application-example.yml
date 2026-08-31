@@ -3,10 +3,10 @@ spring:
     name: eventpulse-api
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mariadb://localhost:3306/eventpulse}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/eventpulse?allowPublicKeyRetrieval=true}
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:Anto$2026}
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
