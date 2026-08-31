@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-test-scan:
     # Machine executor provides a local Docker daemon so Testcontainers
-    # (MariaDBContainerTest) can start MariaDB. The Docker executor cannot.
+    # (MySQLContainerTest) can start MySQL 8. The Docker executor cannot.
     machine:
       image: ubuntu-2204:current
     resource_class: medium

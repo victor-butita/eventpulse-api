@@ -4,7 +4,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.testcontainers.containers.MariaDBContainer
+import org.testcontainers.containers.MySQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
@@ -17,7 +17,7 @@ abstract class IntegrationTestBase {
 
         @Container
         @JvmStatic
-        val mariaDB = MariaDBContainer<Nothing>("mariadb:11")
+        val mysql = MySQLContainer<Nothing>("mysql:8.0")
 
         @JvmStatic
         @DynamicPropertySource
@@ -26,29 +26,29 @@ abstract class IntegrationTestBase {
         ) {
             registry.add(
                 "spring.datasource.url",
-                mariaDB::getJdbcUrl
+                mysql::getJdbcUrl
             )
 
             registry.add(
                 "spring.datasource.username",
-                mariaDB::getUsername
+                mysql::getUsername
             )
 
             registry.add(
                 "spring.datasource.password",
-                mariaDB::getPassword
+                mysql::getPassword
             )
 
             registry.add(
                 "spring.datasource.driver-class-name"
             ) {
-                "org.mariadb.jdbc.Driver"
+                "com.mysql.cj.jdbc.Driver"
             }
 
             registry.add(
                 "spring.jpa.database-platform"
             ) {
-                "org.hibernate.dialect.MariaDBDialect"
+                "org.hibernate.dialect.MySQLDialect"
             }
 
             registry.add(

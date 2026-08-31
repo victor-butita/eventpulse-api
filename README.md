@@ -1,7 +1,7 @@
 # EventPulse API
 
 Backend API for creating and booking event tickets — a lightweight Eventbrite-style service.
-Built with **Spring Boot 3 / Kotlin / Java 17**, MariaDB, Liquibase, Docker, CircleCI, and SonarQube Cloud.
+Built with **Spring Boot 3 / Kotlin / Java 17**, MySQL 8, Liquibase, Docker, CircleCI, and SonarQube Cloud.
 
 Repo: [victor-butita/eventpulse-api](https://github.com/victor-butita/eventpulse-api)
 
@@ -10,7 +10,7 @@ Repo: [victor-butita/eventpulse-api](https://github.com/victor-butita/eventpulse
 | Deliverable | Status |
 |-------------|--------|
 | Maven Kotlin Spring Boot scaffold | Done |
-| Dockerfile + docker-compose (app + MariaDB) | Done |
+| Dockerfile + docker-compose (app + MySQL 8) | Done |
 | Liquibase baseline changelog | Done |
 | CircleCI build-test-scan pipeline | Done |
 | SonarQube Cloud (via CircleCI) | Needs CircleCI env vars |

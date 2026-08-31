@@ -6,18 +6,18 @@ import org.springframework.jdbc.core.JdbcTemplate
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class MariaDBContainerTest : IntegrationTestBase() {
+class MySQLContainerTest : IntegrationTestBase() {
 
     @Autowired
     lateinit var jdbcTemplate: JdbcTemplate
 
     @Test
-    fun `MariaDB container should be running`() {
-        assertTrue(mariaDB.isRunning)
+    fun `MySQL container should be running`() {
+        assertTrue(mysql.isRunning)
     }
 
     @Test
-    fun `should connect to MariaDB`() {
+    fun `should connect to MySQL`() {
         val result = jdbcTemplate.queryForObject(
             "SELECT 1",
             Int::class.java

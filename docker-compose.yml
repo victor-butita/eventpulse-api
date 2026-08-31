@@ -1,20 +1,20 @@
 services:
   db:
-    image: mariadb:11.4
+    image: mysql:8.0
     env_file:
       - path: .env
         required: false
     environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root}
-      MARIADB_DATABASE: ${MARIADB_DATABASE:-eventpulse}
-      MARIADB_USER: ${MARIADB_USER:-eventpulse}
-      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-eventpulse}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-eventpulse}
+      MYSQL_USER: ${MYSQL_USER:-eventpulse}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-eventpulse}
     ports:
       - "3306:3306"
     volumes:
       - eventpulse_db:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -27,7 +27,7 @@ services:
       - path: .env
         required: false
     environment:
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mariadb://db:3306/eventpulse?allowPublicKeyRetrieval=true}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mysql://db:3306/eventpulse?allowPublicKeyRetrieval=true}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-eventpulse}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-eventpulse}
     depends_on:
