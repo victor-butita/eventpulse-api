@@ -5,7 +5,7 @@ spring:
   application:
     name: eventpulse-api
   datasource:
-    url: jdbc:mariadb://localhost:3306/eventpulse
+    url: jdbc:mariadb://localhost:3306/eventpulse?allowPublicKeyRetrieval=true
     username: eventpulse
     password: change-me
     driver-class-name: org.mariadb.jdbc.Driver
