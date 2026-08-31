@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
+import io.swagger.v3.oas.models.servers.Server
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -18,6 +19,16 @@ class OpenApiConfig {
         val schemeName = "bearerAuth"
 
         return OpenAPI()
+            .servers(
+                listOf(
+                    Server()
+                        .url("/")
+                        .description("Current host"),
+                    Server()
+                        .url(PRODUCTION_URL)
+                        .description("Railway production"),
+                )
+            )
             .info(
                 Info()
                     .title("EventPulse API")
@@ -42,5 +53,10 @@ class OpenApiConfig {
             .addSecurityItem(
                 SecurityRequirement().addList(schemeName)
             )
+    }
+
+    companion object {
+        const val PRODUCTION_URL =
+            "https://eventpulse-api-production-259f.up.railway.app"
     }
 }

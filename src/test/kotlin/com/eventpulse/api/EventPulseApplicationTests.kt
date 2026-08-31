@@ -30,6 +30,10 @@ class EventPulseApplicationTests {
         assertThat(openApiConfig).isNotNull
         assertThat(openApi.info.title).isEqualTo("EventPulse API")
         assertThat(openApi.info.version).isEqualTo("v1")
+        assertThat(openApi.servers.map { it.url }).contains(
+            "/",
+            OpenApiConfig.PRODUCTION_URL,
+        )
     }
 
     @Test
