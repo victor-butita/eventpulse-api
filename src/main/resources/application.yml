@@ -2,15 +2,14 @@ spring:
   application:
     name: eventpulse-api
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mariadb://localhost:3306/eventpulse?allowPublicKeyRetrieval=true}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/eventpulse?allowPublicKeyRetrieval=true}
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:Anto$2026}
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       data-source-properties:
-        # MySQL 8 (Railway) uses caching_sha2_password. Without SSL the MariaDB
-        # driver must fetch the server RSA key or auth fails with
-        # "RSA public key is not available client side".
+        # MySQL 8 caching_sha2_password over a non-TLS (Railway private) link
+        # needs the client to fetch the server RSA key.
         allowPublicKeyRetrieval: true
   jpa:
     hibernate:

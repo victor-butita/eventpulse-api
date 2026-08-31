@@ -8,7 +8,7 @@ actor "1. User" as User
 participant "2. Frontend" as UI
 participant "3. API\n(Controllers)" as API
 participant "4. Services" as SVC
-database "5. MariaDB" as DB
+database "5. MySQL" as DB
 
 == Login ==
 User -> UI : Email + password
