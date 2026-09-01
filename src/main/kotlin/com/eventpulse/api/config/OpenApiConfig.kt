@@ -22,11 +22,11 @@ class OpenApiConfig {
             .servers(
                 listOf(
                     Server()
+                        .url(PRODUCTION_URL)
+                        .description("Railway production (HTTPS)"),
+                    Server()
                         .url("/")
                         .description("Current host"),
-                    Server()
-                        .url(PRODUCTION_URL)
-                        .description("Railway production"),
                 )
             )
             .info(
