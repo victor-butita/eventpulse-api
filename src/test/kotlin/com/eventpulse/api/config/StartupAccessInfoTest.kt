@@ -49,6 +49,7 @@ class StartupAccessInfoTest {
         )
 
         assertThat(banner)
+            .contains("Local")
             .contains("http://localhost:8080")
             .contains("http://localhost:8080/api/v1/health")
             .contains("http://localhost:8080/swagger-ui.html")
@@ -70,5 +71,62 @@ class StartupAccessInfoTest {
             .contains("http://localhost:8080/api/api/v1/health")
             .contains("default")
             .contains("8080")
+    }
+
+    @Test
+    fun baseUrlPrefersExplicitPublicUrl() {
+        assertThat(
+            StartupAccessInfo.baseUrl(
+                port = 8080,
+                contextPath = "",
+                publicUrl = "https://eventpulse-api-production-259f.up.railway.app/",
+                railwayPublicDomain = "ignored.example",
+            ),
+        ).isEqualTo(OpenApiConfig.PRODUCTION_URL)
+    }
+
+    @Test
+    fun normalizePublicUrlIgnoresBlank() {
+        assertThat(StartupAccessInfo.normalizePublicUrl(null)).isNull()
+        assertThat(StartupAccessInfo.normalizePublicUrl("  ")).isNull()
+    }
+
+    @Test
+    fun baseUrlUsesRailwayPublicHttpsDomain() {
+        assertThat(
+            StartupAccessInfo.baseUrl(
+                port = 8080,
+                contextPath = "",
+                railwayPublicDomain = "eventpulse-api-production-259f.up.railway.app",
+            ),
+        ).isEqualTo(OpenApiConfig.PRODUCTION_URL)
+    }
+
+    @Test
+    fun baseUrlUsesRailwayProductionWhenEnvironmentIsSet() {
+        assertThat(
+            StartupAccessInfo.baseUrl(
+                port = 8080,
+                contextPath = "",
+                railwayEnvironment = "production",
+            ),
+        ).isEqualTo(OpenApiConfig.PRODUCTION_URL)
+    }
+
+    @Test
+    fun formatBannerPicksRailwayPublicUrl() {
+        val banner = StartupAccessInfo.formatBanner(
+            port = 8080,
+            contextPath = null,
+            activeProfiles = arrayOf("default"),
+            railwayPublicDomain = "eventpulse-api-production-259f.up.railway.app",
+        )
+
+        assertThat(banner)
+            .contains("Public")
+            .contains("https://eventpulse-api-production-259f.up.railway.app")
+            .contains("https://eventpulse-api-production-259f.up.railway.app/api/v1/health")
+            .contains("https://eventpulse-api-production-259f.up.railway.app/swagger-ui.html")
+            .doesNotContain("http://localhost:8080")
     }
 }

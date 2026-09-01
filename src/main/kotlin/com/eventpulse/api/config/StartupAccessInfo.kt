@@ -25,17 +25,59 @@ object StartupAccessInfo {
             activeProfiles.joinToString(", ")
         }
 
-    fun baseUrl(port: Int, contextPath: String): String =
-        "http://localhost:$port$contextPath"
+    fun normalizePublicUrl(raw: String?): String? {
+        val value = raw?.trim()?.ifEmpty { null } ?: return null
+        val withScheme =
+            if (value.startsWith("http://") || value.startsWith("https://")) {
+                value
+            } else {
+                "https://$value"
+            }
+        return withScheme.trimEnd('/')
+    }
+
+    fun baseUrl(
+        port: Int,
+        contextPath: String,
+        publicUrl: String? = null,
+        railwayPublicDomain: String? = null,
+        railwayEnvironment: String? = null,
+    ): String {
+        val fromPublicUrl = normalizePublicUrl(publicUrl)
+        if (fromPublicUrl != null) {
+            return fromPublicUrl + contextPath
+        }
+
+        val fromRailwayDomain = normalizePublicUrl(railwayPublicDomain)
+        if (fromRailwayDomain != null) {
+            return fromRailwayDomain + contextPath
+        }
+
+        if (!railwayEnvironment.isNullOrBlank()) {
+            return OpenApiConfig.PRODUCTION_URL.trimEnd('/') + contextPath
+        }
+
+        return "http://localhost:$port$contextPath"
+    }
 
     fun formatBanner(
         port: Int?,
         contextPath: String?,
         activeProfiles: Array<String>,
+        publicUrl: String? = null,
+        railwayPublicDomain: String? = null,
+        railwayEnvironment: String? = null,
     ): String {
         val resolvedPort = resolvePort(port)
         val resolvedContext = resolveContextPath(contextPath)
-        val base = baseUrl(resolvedPort, resolvedContext)
+        val base = baseUrl(
+            resolvedPort,
+            resolvedContext,
+            publicUrl = publicUrl,
+            railwayPublicDomain = railwayPublicDomain,
+            railwayEnvironment = railwayEnvironment,
+        )
+        val hostLabel = if (base.startsWith("https://")) "Public" else "Local"
         val profiles = resolveProfiles(activeProfiles)
         val health = "$base/api/v1/health"
         val swagger = "$base/swagger-ui.html"
@@ -47,7 +89,7 @@ object StartupAccessInfo {
               $BOLD$GREEN● EventPulse API$RESET  $DIM— ready$RESET
             $CYAN━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$RESET
 
-              $BOLD Local$RESET
+              $BOLD $hostLabel$RESET
                 App ............. $YELLOW$base$RESET
                 Health .......... $YELLOW$health$RESET
 

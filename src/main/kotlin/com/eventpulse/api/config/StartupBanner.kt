@@ -16,14 +16,26 @@ class StartupBanner(
 
     @EventListener(ApplicationReadyEvent::class)
     fun onReady() {
+        val publicUrl = environment.getProperty("APP_PUBLIC_URL")
+        val railwayPublicDomain = environment.getProperty("RAILWAY_PUBLIC_DOMAIN")
+        val railwayEnvironment = environment.getProperty("RAILWAY_ENVIRONMENT")
         val banner = StartupAccessInfo.formatBanner(
             port = serverProperties.port,
             contextPath = serverProperties.servlet.contextPath,
             activeProfiles = environment.activeProfiles,
+            publicUrl = publicUrl,
+            railwayPublicDomain = railwayPublicDomain,
+            railwayEnvironment = railwayEnvironment,
         )
         val port = StartupAccessInfo.resolvePort(serverProperties.port)
         val contextPath = StartupAccessInfo.resolveContextPath(serverProperties.servlet.contextPath)
-        val base = StartupAccessInfo.baseUrl(port, contextPath)
+        val base = StartupAccessInfo.baseUrl(
+            port,
+            contextPath,
+            publicUrl = publicUrl,
+            railwayPublicDomain = railwayPublicDomain,
+            railwayEnvironment = railwayEnvironment,
+        )
 
         println(banner)
         log.info(
