@@ -2,42 +2,53 @@ package com.eventpulse.api.config
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpMethod
+import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.web.cors.CorsConfiguration
 
 class CorsConfigTest {
 
     @Test
-    fun allowedOriginsIncludeRailwayHttpsAndLocalVue() {
-        assertThat(CorsOrigins.allowed)
+    fun patternsIncludeRailwayPortalAndVercel() {
+        assertThat(CorsOrigins.patterns)
             .contains(OpenApiConfig.PRODUCTION_URL)
-            .contains("http://localhost:5173")
-            .doesNotContain("http://eventpulse-api-production-259f.up.railway.app")
+            .contains(CorsOrigins.PORTAL_URL)
+            .contains("https://*.vercel.app")
     }
 
     @Test
-    fun corsSourceAllowsRegisterPreflightFromSwaggerOrigin() {
-        val source = CorsConfig().corsConfigurationSource()
-        val request = org.springframework.mock.web.MockHttpServletRequest().apply {
-            method = "OPTIONS"
-            requestURI = "/api/auth/register"
-            addHeader("Origin", OpenApiConfig.PRODUCTION_URL)
-            addHeader("Access-Control-Request-Method", "POST")
-        }
+    fun corsAllowsVercelPortalOrigin() {
+        val cors = CorsConfig().corsConfigurationSource()
+            .getCorsConfiguration(preflight(CorsOrigins.PORTAL_URL))
 
-        val cors = source.getCorsConfiguration(request)
         assertThat(cors).isNotNull
-        assertThat(cors!!.checkOrigin(OpenApiConfig.PRODUCTION_URL))
-            .isEqualTo(OpenApiConfig.PRODUCTION_URL)
-        assertThat(cors.checkHttpMethod(org.springframework.http.HttpMethod.POST))
-            .contains(org.springframework.http.HttpMethod.POST)
+        assertThat(cors!!.checkOrigin(CorsOrigins.PORTAL_URL))
+            .isEqualTo(CorsOrigins.PORTAL_URL)
+        assertThat(cors.checkHttpMethod(HttpMethod.POST)).contains(HttpMethod.POST)
         assertThat(cors.allowCredentials).isTrue()
+    }
+
+    @Test
+    fun corsAllowsVercelPreviewOrigin() {
+        val preview = "https://event-pulse-portal-git-main-victor.vercel.app"
+        val config = CorsConfiguration().apply {
+            allowedOriginPatterns = CorsOrigins.patterns.toMutableList()
+        }
+        assertThat(config.checkOrigin(preview)).isEqualTo(preview)
     }
 
     @Test
     fun corsRejectsUnknownOrigin() {
         val config = CorsConfiguration().apply {
-            allowedOrigins = CorsOrigins.allowed
+            allowedOriginPatterns = CorsOrigins.patterns.toMutableList()
         }
         assertThat(config.checkOrigin("https://evil.example")).isNull()
+    }
+
+    private fun preflight(origin: String) = MockHttpServletRequest().apply {
+        method = "OPTIONS"
+        requestURI = "/api/auth/register"
+        addHeader("Origin", origin)
+        addHeader("Access-Control-Request-Method", "POST")
     }
 }
